@@ -1,6 +1,18 @@
-# Public repository: release binaries only. Source and signing material stay local.
-/*
-!/.gitignore
-!/README.md
-!/PRIVACY.md
-# Never whitelist local-source, signing keys, source archives, or build intermediates.
+# Public commits contain documentation only; local-source stays UNTRACKED.
+# Local source is intentionally not ignored so the workspace can preserve it.
+# Never git-add local-source. Publication guards reject it.
+/.cache/
+/node_modules/
+/deliverables/
+/local-source/.cache/
+/local-source/node_modules/
+/local-source/build/
+/local-source/signing/
+**/__pycache__/
+*.keystore
+*.jks
+*.p12
+*.b64
+*.apk
+*.apk.idsig
+*.zip
