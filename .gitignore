@@ -1,0 +1,6 @@
+# Public repository: release binaries only. Source and signing material stay local.
+/*
+!/.gitignore
+!/README.md
+!/PRIVACY.md
+# Never whitelist local-source, signing keys, source archives, or build intermediates.
