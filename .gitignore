@@ -16,3 +16,5 @@
 *.apk
 *.apk.idsig
 *.zip
+# Intentionally public, signed binary only. Never add its signing key or sources.
+!/release/moi-uchet.apk

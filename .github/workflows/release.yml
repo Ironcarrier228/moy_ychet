@@ -1,0 +1,63 @@
+name: Publish signed APK (no application sources or signing keys)
+on:
+  workflow_dispatch:
+  push:
+    branches: ['arena/01a0dc57-moy-ychet']
+    paths: ['release/**', '.github/workflows/release.yml']
+permissions:
+  contents: write
+concurrency:
+  group: publish-moy-uchet
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - name: Verify pre-signed binary and metadata
+        shell: bash
+        run: |
+          set -euo pipefail
+          BT=$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -1)
+          "$BT/apksigner" verify --print-certs release/moi-uchet.apk > /tmp/cert.txt
+          "$BT/aapt" dump badging release/moi-uchet.apk > /tmp/badging.txt
+          python3 - <<'PY'
+          import hashlib,json,re,zipfile
+          from pathlib import Path
+          m=json.loads(Path('release/update.json').read_text());apk=Path('release/moi-uchet.apk')
+          assert m['schema']==1 and m['packageName']=='kz.meter' and m['apk']=='moi-uchet.apk'
+          assert re.fullmatch(r'\d+\.\d+\.\d+',m['versionName']) and type(m['versionCode']) is int and m['versionCode']>=12
+          assert 26<=m['minSdk']<=36 and 0<m['size']<=250*1024*1024
+          assert m['size']==apk.stat().st_size and m['sha256']==hashlib.sha256(apk.read_bytes()).hexdigest()
+          certs=re.findall(r'certificate SHA-256 digest: ([0-9a-f]+)',Path('/tmp/cert.txt').read_text())
+          assert certs==['5f5263ea9c8faa3c3abb5bbe71c3ea5d816ab6428443e52902edba241ceb5981']
+          b=Path('/tmp/badging.txt').read_text()
+          assert f"package: name='kz.meter' versionCode='{m['versionCode']}' versionName='{m['versionName']}'" in b
+          assert f"sdkVersion:'{m['minSdk']}'" in b
+          with zipfile.ZipFile(apk) as z:
+              assert not any(n.endswith(('.java','.keystore','.jks','.p12','.b64','.zip')) for n in z.namelist())
+          PY
+      - name: Upload both assets before publishing
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          TAG="v$(python3 -c 'import json;print(json.load(open("release/update.json"))["versionName"])')"
+          if gh release view "$TAG" --json isDraft > /tmp/release.json 2>/dev/null; then
+            if [ "$(python3 -c 'import json;print(json.load(open("/tmp/release.json"))["isDraft"])')" != True ]; then
+              echo 'Published releases are immutable; use a new version.' >&2
+              exit 1
+            fi
+          else
+            gh release create "$TAG" --draft --target "$GITHUB_SHA" --title "Мой учёт ${TAG#v}" --notes-file release/notes.md
+          fi
+          # Only a draft can be repaired after a partial upload.
+          gh release upload "$TAG" release/moi-uchet.apk release/update.json --clobber
+          mkdir /tmp/release-check
+          gh release download "$TAG" --dir /tmp/release-check --pattern moi-uchet.apk --pattern update.json
+          cmp release/moi-uchet.apk /tmp/release-check/moi-uchet.apk
+          cmp release/update.json /tmp/release-check/update.json
+          gh release edit "$TAG" --notes-file release/notes.md --draft=false --latest
