@@ -1,10 +1,10 @@
 {
   "schema": 1,
   "packageName": "kz.meter",
-  "versionCode": 14,
-  "versionName": "0.9.5",
+  "versionCode": 15,
+  "versionName": "0.9.6",
   "minSdk": 26,
   "apk": "moi-uchet.apk",
   "size": 332406,
-  "sha256": "d4cf78805b3c2e36b883ba9d27349b2362a181a91a34d2086cb17d31408202c1"
+  "sha256": "f7dc334fdecbd36d84b7c128cfcc22b5b4533531eba9d9646768737d9c5b161e"
 }
