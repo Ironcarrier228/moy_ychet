@@ -6,8 +6,8 @@
 
 Готовые версии размещаются в [Releases](https://github.com/Ironcarrier228/moy_ychet/releases).
 Скачивайте **`moi-uchet.apk`**, а не «Source code (zip / tar.gz)».
-Версия **0.9.6** собрана и подписана тем же сертификатом, что и предыдущие.
-[Скачать APK 0.9.6](https://github.com/Ironcarrier228/moy_ychet/releases/download/v0.9.6/moi-uchet.apk).
+Версия **0.9.7** собрана и подписана тем же сертификатом, что и предыдущие.
+[Скачать APK 0.9.7](https://github.com/Ironcarrier228/moy_ychet/releases/download/v0.9.7/moi-uchet.apk).
 Сборка и подпись проверены; установка на настоящем телефоне ещё требует проверки.
 
 В версии **0.9.3** добавлена система обновлений:
